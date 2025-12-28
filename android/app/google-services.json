@@ -12,7 +12,20 @@
           "package_name": "com.example.govguide"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "531884580776-i5bd6k6q81o8mgc81us0funrogcb6hec.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.govguide",
+            "certificate_hash": "66363d55974c9b45ff2329931f4d9f1ef6ed9306"
+          }
+        },
+        {
+          "client_id": "531884580776-l3to8c0ju8vgeqmrk0gsmjhg6jho925k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyD-RWexdZO0Qir-JDHpEbbFn2jynI304Ag"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531884580776-l3to8c0ju8vgeqmrk0gsmjhg6jho925k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "531884580776-af8l03enmhf53asgnt3lhfkr9g4s653s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.govguide"
+              }
+            }
+          ]
         }
       }
     }

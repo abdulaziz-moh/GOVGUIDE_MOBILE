@@ -1,11 +1,16 @@
 
 import 'package:flutter/material.dart';
+import 'package:govguide/auth/auth_provider.dart';
+import 'package:govguide/auth/login_screen.dart';
+import 'package:provider/provider.dart';
 
 class GovGuideApp extends StatelessWidget {
   const GovGuideApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    
     return MaterialApp(
       title: 'GovGuide',
       debugShowCheckedModeBanner: false,
@@ -28,7 +33,7 @@ class GovGuideApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const MainScreen(),
+      home: authProvider.isLoggedIn? const MainScreen() : const LoginScreen(), //here we the home route choosed 
     );
   }
 }
