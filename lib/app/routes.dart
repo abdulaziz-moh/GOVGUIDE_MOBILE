@@ -5,7 +5,9 @@ import 'package:govguide/screens/home/home_screen.dart';
 import 'package:govguide/screens/processes/process_detail_screen.dart';
 import 'package:govguide/screens/processes/process_post.dart';
 import 'package:govguide/screens/profile/profile_screen.dart';
+import 'package:govguide/screens/support/create_ticket_screen.dart';
 import 'package:govguide/screens/support/my_tickets_screen.dart';
+import 'package:govguide/screens/support/ticket_success_screen.dart';
 
 GoRouter createRouter(AuthProvider authProvider) {
   return GoRouter(
@@ -58,6 +60,15 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/post',
         builder: (context, state) => const PostProcessScreen(),
+      ),
+      GoRoute(
+        path: '/create-ticket',
+        builder: (context, state) => const CreateTicketScreen(),
+      ),
+      // In your GoRouter config file:
+      GoRoute(
+        path: '/ticket-success',
+        builder: (context, state) => const TicketSuccessScreen(),
       ),
     ],
   );
