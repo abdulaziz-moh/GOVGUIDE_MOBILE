@@ -1,154 +1,213 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:govguide/auth/auth_service.dart';
-import 'package:govguide/screens/home/home_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
+
+  // Helper to safely update loading state
+  void _setLoading(bool value) {
+    if (mounted) {
+      setState(() => _isLoading = value);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(Icons.facebook, size: 80, color: Color(0xFF1877F2)),
-              const SizedBox(height: 20),
-              Text(
-                "Welcome Back",
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Column(
+                  children: [
+                    // --- MINIMALIST BRANDING ---
+                    const Text(
+                      "GG",
+                      style: TextStyle(
+                        color: Color(0xFF1877F2),
+                        fontSize: 48,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -2,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // --- INPUT SECTION ---
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          _buildModernField("Email address", Icons.email_outlined),
+                          const SizedBox(height: 12),
+                          _buildModernField("Password", Icons.lock_outline, isPassword: true),
+                          const SizedBox(height: 20),
+
+                          // PRIMARY SIGN IN
+                          SizedBox(
+                            width: double.infinity,
+                            height: 52,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1877F2),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                elevation: 0,
+                              ),
+                              onPressed: () {
+                                // Add your logic for email login here
+                                context.go('/');
+                              },
+                              child: const Text(
+                                "Log In",
+                                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                          
+                          TextButton(
+                            onPressed: () {},
+                            child: const Text(
+                              "Forgotten password?",
+                              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+                    const Row(
+                      children: [
+                        Expanded(child: Divider()),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          child: Text("OR", style: TextStyle(color: Colors.grey, fontSize: 12)),
+                        ),
+                        Expanded(child: Divider()),
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+
+                    // --- GOOGLE SIGN IN (SOCIAL OPTION) ---
+                    _SocialSignInButton(
+                      onLoading: _setLoading,
+                    ),
+
+                    const SizedBox(height: 60),
+
+                    // --- FOOTER ACTION ---
+                    OutlinedButton(
+                      onPressed: () => context.push('/signup'),
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 45),
+                        side: const BorderSide(color: Color(0xFF1877F2)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text(
+                        "Create new account",
+                        style: TextStyle(color: Color(0xFF1877F2), fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 30),
-              const LoginForm(),
-              GoogleSignInButton(),
-            ],
+            ),
           ),
+          
+          // FULL SCREEN LOADER
+          if (_isLoading)
+            Container(
+              // Using Opacity for better performance
+              color: Colors.white.withOpacity(0.8),
+              child: const Center(child: CircularProgressIndicator(color: Color(0xFF1877F2))),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModernField(String hint, IconData icon, {bool isPassword = false}) {
+    return TextFormField(
+      obscureText: isPassword,
+      style: const TextStyle(fontSize: 16),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
+        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        filled: true,
+        fillColor: const Color(0xFFF5F6F7),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFE4E6EB)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF1877F2), width: 1.5),
         ),
       ),
     );
   }
 }
 
-class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+class _SocialSignInButton extends StatelessWidget {
+  final Function(bool) onLoading;
+  const _SocialSignInButton({required this.onLoading});
 
-  @override
-  State<LoginForm> createState() => _LoginFormState();
-}
-
-class _LoginFormState extends State<LoginForm> {
-  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: "Username",
-                floatingLabelStyle: TextStyle(color: Colors.blue),
-                prefixIcon: Icon(Icons.person),
-                focusColor: Colors.blue,
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Please enter your email";
-                }
-                if (!value.contains('@')) {
-                  return "Please enter a valid email";
-                }
-                return null;
-              },
+    return InkWell(
+      onTap: () async {
+        onLoading(true);
+        try {
+          final user = await AuthService().signInWithGoogle();
+          
+          // CRITICAL: Check if the widget is still in the tree before navigating
+          if (!context.mounted) return;
+
+          if (user != null) {
+            context.go('/');
+          }
+        } catch (e) {
+          debugPrint("Google Sign In Error: $e");
+        } finally {
+          // The onLoading function handles the 'mounted' check internally
+          onLoading(false);
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+        decoration: BoxDecoration(
+          border: Border.all(color: const Color(0xFFE4E6EB)),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.network(
+              'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
+              height: 20,
+              // Error builder for broken image links
+              errorBuilder: (context, error, stackTrace) => const Icon(Icons.login),
             ),
-
-            SizedBox(height: 20),
-
-            TextFormField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: "Password",
-                floatingLabelStyle: TextStyle(color: Colors.blue),
-                prefixIcon: Icon(Icons.password),
-                focusColor: Colors.blue,
-                border: OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.blue, width: 2.0),
-                ),
-              ),
-              validator: (value) {
-                if (value == null) {
-                  return "Please enter a password";
-                }
-                if (value.length < 8) {
-                  return "Password length must be greater than 8";
-                }
-                return null;
-              },
-            ),
-
-            SizedBox(height: 20),
-
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                    print("Form is valid. Navigating... ");
-                  } else {
-                    print("Form is invalid. Try again.");
-                  }
-                },
-                child: Text("Log In"),
-              ),
+            const SizedBox(width: 12),
+            const Text(
+              "Continue with Google",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-
-class GoogleSignInButton extends StatelessWidget {
-  const GoogleSignInButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.blue,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-          ),
-      onPressed: () async {
-            await AuthService().signInWithGoogle();
-          },
-      child: const Text("Continue with Google"),
     );
   }
 }

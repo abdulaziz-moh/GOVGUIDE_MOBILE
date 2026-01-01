@@ -25,7 +25,20 @@ class AuthService {
   }
 }
 
-  Future<void> signOut() async {
+  // Future<void> signOut() async {
+  //   await _auth.signOut();
+  // }
+
+  // Modify this in your auth_service.dart
+Future<void> signOut() async {
+  try {
+    // 1. Sign out from Google (this forces the account picker next time)
+    await GoogleSignIn().signOut();
+    
+    // 2. Sign out from Firebase
     await _auth.signOut();
+  } catch (e) {
+    print("Error during logout: $e");
   }
+}
 }

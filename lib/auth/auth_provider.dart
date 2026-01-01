@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:govguide/auth/auth_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -18,7 +19,13 @@ class AuthProvider extends ChangeNotifier {
 
   bool get isLoggedIn => _user != null;
 
-  Future<void> signOut() async {
-    await _auth.signOut();
-  }
+  // Future<void> signOut() async {
+  //   await _auth.signOut();
+  // }
+  // Modify this in your auth_provider.dart
+Future<void> signOut() async {
+  // Use the logic that includes GoogleSignIn().signOut()
+  await AuthService().signOut(); 
+  // notifyListeners() is usually handled by the authStateChanges listener
+}
 }
