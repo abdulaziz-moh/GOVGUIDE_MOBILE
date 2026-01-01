@@ -209,7 +209,7 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
                           ],
                         ),
                       );
-                    }).toList(),
+                    }),
 
                     const Divider(height: 40),
                     const Text("Contact Information (Optional)", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

@@ -13,7 +13,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
-  // Helper to safely update loading state
+  // Helper to safely update loading state and avoid "setState after dispose"
   void _setLoading(bool value) {
     if (mounted) {
       setState(() => _isLoading = value);
@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           _buildModernField("Password", Icons.lock_outline, isPassword: true),
                           const SizedBox(height: 20),
 
-                          // PRIMARY SIGN IN
                           SizedBox(
                             width: double.infinity,
                             height: 52,
@@ -64,10 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 elevation: 0,
                               ),
-                              onPressed: () {
-                                // Add your logic for email login here
-                                context.go('/');
-                              },
+                              onPressed: () => context.go('/'),
                               child: const Text(
                                 "Log In",
                                 style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
@@ -99,14 +95,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 30),
 
-                    // --- GOOGLE SIGN IN (SOCIAL OPTION) ---
+                    // --- GOOGLE SIGN IN ---
                     _SocialSignInButton(
                       onLoading: _setLoading,
                     ),
 
                     const SizedBox(height: 60),
 
-                    // --- FOOTER ACTION ---
                     OutlinedButton(
                       onPressed: () => context.push('/signup'),
                       style: OutlinedButton.styleFrom(
@@ -125,11 +120,11 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           
-          // FULL SCREEN LOADER
+          // --- FULL SCREEN LOADER WITH NEW SYNTAX ---
           if (_isLoading)
             Container(
-              // Using Opacity for better performance
-              color: Colors.white.withOpacity(0.8),
+              // FIX: Replaced .withOpacity with .withValues
+              color: Colors.white.withValues(alpha: 0.8), 
               child: const Center(child: CircularProgressIndicator(color: Color(0xFF1877F2))),
             ),
         ],
@@ -172,16 +167,13 @@ class _SocialSignInButton extends StatelessWidget {
         try {
           final user = await AuthService().signInWithGoogle();
           
-          // CRITICAL: Check if the widget is still in the tree before navigating
+          // Check if user navigated away during the async call
           if (!context.mounted) return;
 
           if (user != null) {
             context.go('/');
           }
-        } catch (e) {
-          debugPrint("Google Sign In Error: $e");
         } finally {
-          // The onLoading function handles the 'mounted' check internally
           onLoading(false);
         }
       },
@@ -197,7 +189,6 @@ class _SocialSignInButton extends StatelessWidget {
             Image.network(
               'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/1200px-Google_%22G%22_logo.svg.png',
               height: 20,
-              // Error builder for broken image links
               errorBuilder: (context, error, stackTrace) => const Icon(Icons.login),
             ),
             const SizedBox(width: 12),
