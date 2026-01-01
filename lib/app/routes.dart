@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:govguide/auth/auth_provider.dart';
 import 'package:govguide/auth/login_screen.dart';
+import 'package:govguide/auth/signup_screen.dart'; // Ensure this import is correct
+import 'package:govguide/screens/help/help_screen.dart';
 import 'package:govguide/screens/home/home_screen.dart';
 import 'package:govguide/screens/processes/process_detail_screen.dart';
 import 'package:govguide/screens/processes/process_post.dart';
@@ -17,22 +19,24 @@ GoRouter createRouter(AuthProvider authProvider) {
     redirect: (context, state) {
       final bool isLoggedIn = authProvider.isLoggedIn;
       final bool isLoggingIn = state.matchedLocation == '/login';
+      final bool isSigningUp = state.matchedLocation == '/signup'; // Added this check
 
-      // CHECK IF PATH IS PUBLIC
-      // This allows anyone to view the home page or a specific process detail
+      // UPDATED: Include /signup as a public page
       final bool isPublicPage =
           state.matchedLocation == '/' ||
+          state.matchedLocation == '/signup' || // Allow signup
           state.matchedLocation.startsWith('/details');
 
       if (!isLoggedIn) {
-        // If not logged in, allow access to public pages or the login screen
+        // If not logged in, allow access to public pages, login, or signup
         if (isPublicPage || isLoggingIn) return null;
 
         // Otherwise, force login
         return '/login';
       }
 
-      if (isLoggingIn) {
+      // If already logged in, don't let them see login or signup pages
+      if (isLoggingIn || isSigningUp) {
         return '/';
       }
 
@@ -41,7 +45,10 @@ GoRouter createRouter(AuthProvider authProvider) {
     routes: [
       GoRoute(path: '/', builder: (context, state) => const HomeScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-      // ADD THE DETAILS ROUTE HERE
+      
+      // ADDED THE SIGNUP ROUTE HERE
+      GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
+
       GoRoute(
         path: '/details/:id',
         builder: (context, state) {
@@ -65,10 +72,13 @@ GoRouter createRouter(AuthProvider authProvider) {
         path: '/create-ticket',
         builder: (context, state) => const CreateTicketScreen(),
       ),
-      // In your GoRouter config file:
       GoRoute(
         path: '/ticket-success',
         builder: (context, state) => const TicketSuccessScreen(),
+      ),
+      GoRoute(
+        path: '/help',
+        builder: (context, state) => const HelpCenterScreen(),
       ),
     ],
   );

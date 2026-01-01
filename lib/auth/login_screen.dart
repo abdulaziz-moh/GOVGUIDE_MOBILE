@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:govguide/auth/auth_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,11 +13,43 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   final _formKey = GlobalKey<FormState>();
+  
+  // ADDED: Controllers to get the text from the fields
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
-  // Helper to safely update loading state and avoid "setState after dispose"
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void _setLoading(bool value) {
     if (mounted) {
       setState(() => _isLoading = value);
+    }
+  }
+
+  // ADDED: Real Email/Password Login Logic
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      _setLoading(true);
+      try {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+        if (mounted) context.go('/'); 
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Login Failed: ${e.toString()}")),
+          );
+        }
+      } finally {
+        _setLoading(false);
+      }
     }
   }
 
@@ -32,7 +65,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Column(
                   children: [
-                    // --- MINIMALIST BRANDING ---
                     const Text(
                       "GG",
                       style: TextStyle(
@@ -44,14 +76,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 40),
 
-                    // --- INPUT SECTION ---
                     Form(
                       key: _formKey,
                       child: Column(
                         children: [
-                          _buildModernField("Email address", Icons.email_outlined),
+                          _buildModernField("Email address", Icons.email_outlined, _emailController),
                           const SizedBox(height: 12),
-                          _buildModernField("Password", Icons.lock_outline, isPassword: true),
+                          _buildModernField("Password", Icons.lock_outline, _passwordController, isPassword: true),
                           const SizedBox(height: 20),
 
                           SizedBox(
@@ -63,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 elevation: 0,
                               ),
-                              onPressed: () => context.go('/'),
+                              onPressed: _handleLogin, // Updated to handle real login
                               child: const Text(
                                 "Log In",
                                 style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
@@ -95,15 +126,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 30),
 
-                    // --- GOOGLE SIGN IN ---
-                    _SocialSignInButton(
-                      onLoading: _setLoading,
-                    ),
+                    _SocialSignInButton(onLoading: _setLoading),
 
                     const SizedBox(height: 60),
 
                     OutlinedButton(
-                      onPressed: () => context.push('/signup'),
+                      onPressed: () => context.push('/signup'), // Ensure this matches your router!
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 45),
                         side: const BorderSide(color: Color(0xFF1877F2)),
@@ -120,10 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           
-          // --- FULL SCREEN LOADER WITH NEW SYNTAX ---
           if (_isLoading)
             Container(
-              // FIX: Replaced .withOpacity with .withValues
               color: Colors.white.withValues(alpha: 0.8), 
               child: const Center(child: CircularProgressIndicator(color: Color(0xFF1877F2))),
             ),
@@ -132,10 +158,12 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildModernField(String hint, IconData icon, {bool isPassword = false}) {
+  Widget _buildModernField(String hint, IconData icon, TextEditingController controller, {bool isPassword = false}) {
     return TextFormField(
+      controller: controller, // Added controller
       obscureText: isPassword,
       style: const TextStyle(fontSize: 16),
+      validator: (val) => val!.isEmpty ? "Enter your $hint" : null,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 15),
@@ -166,13 +194,8 @@ class _SocialSignInButton extends StatelessWidget {
         onLoading(true);
         try {
           final user = await AuthService().signInWithGoogle();
-          
-          // Check if user navigated away during the async call
           if (!context.mounted) return;
-
-          if (user != null) {
-            context.go('/');
-          }
+          if (user != null) context.go('/');
         } finally {
           onLoading(false);
         }

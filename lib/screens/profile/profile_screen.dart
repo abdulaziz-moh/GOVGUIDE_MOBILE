@@ -115,7 +115,7 @@ class ProfileScreen extends StatelessWidget {
             _buildCardWrapper([
               _buildMenuTile(Icons.chat_outlined, "My Tickets", () => context.push('/tickets')),
               _buildMenuTile(Icons.assignment_outlined, "My Processes", () => context.push('/processes')),
-              _buildMenuTile(Icons.help_outline, "Help Center", () => context.push('/help-center')),
+              _buildMenuTile(Icons.help_outline, "Help Center", () => context.push('/help')),
               _buildMenuTile(Icons.settings_outlined, "Settings", () => context.push('/settings'), isLast: true),
             ]),
             
