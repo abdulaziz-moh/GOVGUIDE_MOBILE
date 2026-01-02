@@ -7,9 +7,9 @@ import 'package:govguide/screens/home/home_screen.dart';
 import 'package:govguide/screens/processes/process_detail_screen.dart';
 import 'package:govguide/screens/processes/process_post.dart';
 import 'package:govguide/screens/profile/profile_screen.dart';
-import 'package:govguide/screens/support/create_ticket_screen.dart';
-import 'package:govguide/screens/support/my_tickets_screen.dart';
-import 'package:govguide/screens/support/ticket_success_screen.dart';
+import 'package:govguide/screens/ticket/create_ticket_screen.dart';
+import 'package:govguide/screens/ticket/my_tickets_screen.dart';
+import 'package:govguide/screens/ticket/ticket_success_screen.dart';
 
 GoRouter createRouter(AuthProvider authProvider) {
   return GoRouter(

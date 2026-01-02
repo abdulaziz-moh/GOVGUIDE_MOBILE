@@ -33,12 +33,6 @@ class _TicketsScreenState extends State<TicketsScreen> {
           "My Tickets",
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {}, // Optional: Add global filter logic here
-            icon: const FaIcon(FontAwesomeIcons.filter, size: 18, color: Colors.black),
-          ),
-        ],
       ),
       body: Column(
         children: [
