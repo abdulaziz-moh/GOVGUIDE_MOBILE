@@ -101,15 +101,11 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Column(
                   children: [
                     // --- BRANDING ---
-                    const Text(
-                      "GG",
-                      style: TextStyle(
-                        color: Color(0xFF1877F2),
-                        fontSize: 42,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -2,
-                      ),
-                    ),
+                    Image.asset(
+            'assets/images/splash.png',
+            height: 110, // Standard AppBar height scale
+            fit: BoxFit.contain,
+          ),
                     const SizedBox(height: 8),
                     const Text(
                       "Create a new account",

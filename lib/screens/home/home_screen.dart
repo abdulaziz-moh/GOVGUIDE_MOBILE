@@ -163,19 +163,10 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       title: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.blueAccent,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: const Text(
-              "GG",
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          Image.asset(
+            'assets/images/splash.png',
+            height: 50, // Standard AppBar height scale
+            fit: BoxFit.contain,
           ),
           const SizedBox(width: 10),
           const Text(

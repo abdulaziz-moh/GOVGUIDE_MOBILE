@@ -65,15 +65,27 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 30.0),
                 child: Column(
                   children: [
-                    const Text(
-                      "GG",
+          Image.asset(
+            'assets/images/splash.png',
+            height: 110, // Standard AppBar height scale
+            fit: BoxFit.contain,
+          ),
+          const Text(
+                      "govguide",
                       style: TextStyle(
-                        color: Color(0xFF1877F2),
-                        fontSize: 48,
+                        fontFamily: "Arial",
+                        color: Color.fromARGB(150, 55, 182, 255),
+                        fontSize: 32,
                         fontWeight: FontWeight.w900,
-                        letterSpacing: -2,
+                        letterSpacing: 0,
                       ),
                     ),
+
+          // Image.asset(
+          //   'assets/images/brandimage.png',
+          //   height: 110, // Standard AppBar height scale
+          //   fit: BoxFit.contain,
+          // ),
                     const SizedBox(height: 40),
 
                     Form(
