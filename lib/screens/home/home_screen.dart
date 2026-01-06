@@ -272,7 +272,6 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // ================= CATEGORY CHIP =================
-// Refactored to avoid complex findAncestorState calls which can cause context errors
 
 class _CategoryChip extends StatelessWidget {
   final String label;
@@ -293,7 +292,11 @@ class _CategoryChip extends StatelessWidget {
         label: Text(label),
         selected: isSelected,
         selectedColor: Colors.blueAccent,
+        backgroundColor: const Color(0xFFEAF0FF),
         labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black),
+        side: BorderSide.none,
+        surfaceTintColor: Colors.transparent, // IMPORTANT
+
         onSelected: (bool selected) {
           if (selected) onSelected(label);
         },
@@ -303,7 +306,6 @@ class _CategoryChip extends StatelessWidget {
 }
 
 // ================= SERVICE CARD =================
-// Keep as you had it, but ensure context.push is used safely
 
 class ServiceCard extends StatefulWidget {
   final ProcessModel process;
@@ -320,6 +322,8 @@ class _ServiceCardState extends State<ServiceCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
+      surfaceTintColor: Colors.transparent,
+      color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
