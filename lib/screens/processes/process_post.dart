@@ -42,6 +42,16 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
     super.dispose();
   }
 
+  // --- ADDED KEYWORD GENERATOR ---
+  List<String> _generateKeywords(String title, String description) {
+    String combined = "${title.toLowerCase()} ${description.toLowerCase()}";
+    return combined
+        .split(RegExp(r'[\s\-_,.]+'))
+        .where((word) => word.length > 1)
+        .toSet()
+        .toList();
+  }
+
   void _addStep() {
     setState(() => _stepControllers.add(TextEditingController()));
   }
@@ -63,7 +73,6 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
   }
 
   Future<void> _publishProcess() async {
-    // 1. Validate Form (Triggers all TextFormField and FormField validators)
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please fill in all required fields"), backgroundColor: Colors.redAccent),
@@ -82,10 +91,15 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
         imageUrl = await ref.getDownloadURL();
       }
 
-      // Prepare steps list
       List<String> steps = _stepControllers
           .map((c) => c.text.trim())
           .toList();
+
+      // --- GENERATE SEARCH KEYWORDS ---
+      List<String> keywords = _generateKeywords(
+        _titleController.text.trim(),
+        _descController.text.trim(),
+      );
 
       // Save to Firestore
       await FirebaseFirestore.instance.collection('processes').add({
@@ -93,6 +107,7 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
         'tag': _selectedCategory,
         'agency': _agencyController.text.trim(),
         'description': _descController.text.trim(),
+        'searchKeywords': keywords, // <--- ADDED FIELD
         'steps': steps,
         'location': _locationController.text.trim(),
         'phone': _phoneController.text.trim(),

@@ -176,7 +176,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 20),
 
                     TextButton(
-                      onPressed: () => context.go('/login'),
+                      onPressed: () => context.pop(),
                       child: const Text(
                         "Already have an account?",
                         style: TextStyle(color: Color(0xFF1877F2), fontWeight: FontWeight.bold),
