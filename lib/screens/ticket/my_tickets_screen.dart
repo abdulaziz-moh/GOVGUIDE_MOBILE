@@ -58,10 +58,14 @@ class _TicketsScreenState extends State<TicketsScreen> {
                       selectedColor: const Color(0xFF1A73E8),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : Colors.black87,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.normal,
                       ),
                       backgroundColor: const Color(0xFFF1F3F4),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
                       side: BorderSide.none,
                     ),
                   );
@@ -75,7 +79,9 @@ class _TicketsScreenState extends State<TicketsScreen> {
             child: StreamBuilder<QuerySnapshot>(
               stream: _getFilteredStream(user?.uid),
               builder: (context, snapshot) {
-                if (snapshot.hasError) return const Center(child: Text("Error loading tickets"));
+                if (snapshot.hasError) {
+                  return const Center(child: Text("Error loading tickets"));
+                }
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -88,17 +94,21 @@ class _TicketsScreenState extends State<TicketsScreen> {
 
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: docs.length,
+                  itemCount: docs.length + 1,
                   itemBuilder: (context, index) {
-                    final data = docs[index].data() as Map<String, dynamic>;
-                    return _TicketCard(
-                      id: docs[index].id,
-                      title: data['title'] ?? 'Untitled Ticket',
-                      category: data['category'] ?? 'General',
-                      status: data['status'] ?? 'Open',
-                      priority: data['priority'] ?? 'Medium',
-                      timestamp: data['createdAt'] as Timestamp?,
-                    );
+                    if (index < docs.length) {
+                      final data = docs[index].data() as Map<String, dynamic>;
+                      return _TicketCard(
+                        id: docs[index].id,
+                        title: data['title'] ?? 'Untitled Ticket',
+                        category: data['category'] ?? 'General',
+                        status: data['status'] ?? 'Open',
+                        priority: data['priority'] ?? 'Medium',
+                        timestamp: data['createdAt'] as Timestamp?,
+                      );
+                    } else {
+                      return SizedBox(height: 100);
+                    }
                   },
                 );
               },
@@ -111,7 +121,11 @@ class _TicketsScreenState extends State<TicketsScreen> {
         onPressed: () => context.push('/create-ticket'),
         shape: const CircleBorder(),
         backgroundColor: const Color(0xFF1A73E8),
-        child: const FaIcon(FontAwesomeIcons.message, size: 20, color: Colors.white),
+        child: const FaIcon(
+          FontAwesomeIcons.plus,
+          size: 20,
+          color: Colors.white,
+        ),
         // Icon(Icons.add_comment_rounded, color: Colors.white),
       ),
     );
@@ -168,11 +182,13 @@ class _TicketCard extends StatelessWidget {
     }
 
     // Small Priority Dot logic
-    Color priorityColor = priority == "High" ? Colors.red : (priority == "Medium" ? Colors.amber : Colors.green);
+    Color priorityColor = priority == "High"
+        ? Colors.red
+        : (priority == "Medium" ? Colors.amber : Colors.green);
 
     // Using DateFormat from the intl package
-    String formattedDate = timestamp != null 
-        ? DateFormat('MMM d, h:mm a').format(timestamp!.toDate()) 
+    String formattedDate = timestamp != null
+        ? DateFormat('MMM d, h:mm a').format(timestamp!.toDate())
         : "Pending...";
 
     return Container(
@@ -182,7 +198,11 @@ class _TicketCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFEEEEEE)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Padding(
@@ -197,7 +217,10 @@ class _TicketCard extends StatelessWidget {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -205,7 +228,10 @@ class _TicketCard extends StatelessWidget {
                 Container(
                   width: 10,
                   height: 10,
-                  decoration: BoxDecoration(color: priorityColor, shape: BoxShape.circle),
+                  decoration: BoxDecoration(
+                    color: priorityColor,
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ],
             ),
@@ -218,14 +244,21 @@ class _TicketCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF1F3F4),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     category.toUpperCase(),
-                    style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black54),
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black54,
+                    ),
                   ),
                 ),
               ],
@@ -239,11 +272,21 @@ class _TicketCard extends StatelessWidget {
                   style: const TextStyle(color: Colors.black45, fontSize: 12),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                   child: Text(
                     status,
-                    style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: statusColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ],

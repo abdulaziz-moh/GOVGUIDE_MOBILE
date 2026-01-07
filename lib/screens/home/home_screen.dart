@@ -49,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     Query query = _firestore
         .collection('processes')
-        .orderBy('createdAt');
+        .orderBy('createdAt', descending: true);
 
     if (_selectedCategory != "All") {
       query = query.where('tag', isEqualTo: _selectedCategory);
@@ -129,7 +129,11 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () => context.push('/post'),
         backgroundColor: Colors.blueAccent,
         shape: const CircleBorder(),
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const FaIcon(
+          FontAwesomeIcons.plus,
+          size: 20,
+          color: Colors.white,
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
@@ -184,10 +188,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       actions: [
-        IconButton(
-          icon: const FaIcon(FontAwesomeIcons.bell, size: 20),
-          onPressed: () {},
-        ),
+        // IconButton(
+        //   icon: const FaIcon(FontAwesomeIcons.bell, size: 20),
+        //   onPressed: () {},
+        // ),
         IconButton(
           icon: const FaIcon(FontAwesomeIcons.bars, size: 20),
           onPressed: () => context.push('/profile'),
@@ -354,7 +358,7 @@ class _ServiceCardState extends State<ServiceCard> {
               Container(
                 height: 160,
                 width: double.infinity,
-                margin: const EdgeInsets.only(bottom: 12),
+                // margin: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(16),
@@ -368,8 +372,9 @@ class _ServiceCardState extends State<ServiceCard> {
                 ),
               ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start, 
                 children: [
                   Row(
                     children: [
@@ -405,6 +410,7 @@ class _ServiceCardState extends State<ServiceCard> {
                   const SizedBox(height: 12),
                   Text(
                     widget.process.description,
+                    // textAlign: TextAlign.left,
                     style: TextStyle(
                       color: Colors.grey.shade600,
                     ),

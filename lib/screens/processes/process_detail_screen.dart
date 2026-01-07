@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 
 class ProcessDetailScreen extends StatefulWidget {
   final String processId;
@@ -241,7 +242,9 @@ class _ProcessDetailScreenState extends State<ProcessDetailScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  context.push('/create-ticket');
+                },
                 icon: const Icon(
                   Icons.chat_bubble_outline,
                   size: 18,
