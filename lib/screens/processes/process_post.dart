@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Added for User ID
 
 class PostProcessScreen extends StatefulWidget {
   const PostProcessScreen({super.key});
@@ -42,7 +43,6 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
     super.dispose();
   }
 
-  // --- ADDED KEYWORD GENERATOR ---
   List<String> _generateKeywords(String title, String description) {
     String combined = "${title.toLowerCase()} ${description.toLowerCase()}";
     return combined
@@ -80,6 +80,15 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
       return;
     }
 
+    // Get current user ID
+    final User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error: You must be logged in to post"), backgroundColor: Colors.redAccent),
+      );
+      return;
+    }
+
     setState(() => _isUploading = true);
 
     try {
@@ -95,19 +104,19 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
           .map((c) => c.text.trim())
           .toList();
 
-      // --- GENERATE SEARCH KEYWORDS ---
       List<String> keywords = _generateKeywords(
         _titleController.text.trim(),
         _descController.text.trim(),
       );
 
-      // Save to Firestore
+      // Save to Firestore with userId
       await FirebaseFirestore.instance.collection('processes').add({
+        'userId': user.uid, // <--- ADDED FIELD FOR FILTERING
         'title': _titleController.text.trim(),
         'tag': _selectedCategory,
         'agency': _agencyController.text.trim(),
         'description': _descController.text.trim(),
-        'searchKeywords': keywords, // <--- ADDED FIELD
+        'searchKeywords': keywords,
         'steps': steps,
         'location': _locationController.text.trim(),
         'phone': _phoneController.text.trim(),

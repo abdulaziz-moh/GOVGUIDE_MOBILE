@@ -89,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           _buildCountItem(context, 'processes', Icons.description_outlined, "Processes", Colors.blue, user?.uid),
                           _buildCountItem(context, 'tickets', Icons.chat_bubble_outline, "Tickets", Colors.indigo, user?.uid),
-                          _buildCountItem(context, 'reviews', Icons.star_outline, "Reviews", Colors.amber, user?.uid),
+                          // _buildCountItem(context, 'reviews', Icons.star_outline, "Reviews", Colors.amber, user?.uid),
                         ],
                       ),
                     ),
@@ -114,9 +114,9 @@ class ProfileScreen extends StatelessWidget {
             // --- NAVIGATION MENU ---
             _buildCardWrapper([
               _buildMenuTile(Icons.chat_outlined, "My Tickets", () => context.push('/tickets')),
-              _buildMenuTile(Icons.assignment_outlined, "My Processes", () => context.push('/processes')),
-              _buildMenuTile(Icons.help_outline, "Help Center", () => context.push('/help')),
-              _buildMenuTile(Icons.settings_outlined, "Settings", () => context.push('/settings'), isLast: true),
+              _buildMenuTile(Icons.assignment_outlined, "My Processes", () => context.push('/my-processes')),
+              _buildMenuTile(Icons.help_outline, "Help Center", () => context.push('/help') , isLast: true),
+              // _buildMenuTile(Icons.settings_outlined, "Settings", () => context.push('/settings'), isLast: true),
             ]),
             
             // --- LOGOUT ---
@@ -237,7 +237,7 @@ class ProfileScreen extends StatelessWidget {
           trailing: const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
           onTap: onTap,
         ),
-        if (!isLast) const Divider(height: 1),
+        if (!isLast) const Divider(height: 1, color: Colors.grey,),
       ],
     );
   }

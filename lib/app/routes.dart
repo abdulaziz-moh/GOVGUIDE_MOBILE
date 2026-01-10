@@ -4,6 +4,7 @@ import 'package:govguide/auth/login_screen.dart';
 import 'package:govguide/auth/signup_screen.dart'; // Ensure this import is correct
 import 'package:govguide/screens/help/help_screen.dart';
 import 'package:govguide/screens/home/home_screen.dart';
+import 'package:govguide/screens/processes/my_processes_screen.dart';
 import 'package:govguide/screens/processes/process_detail_screen.dart';
 import 'package:govguide/screens/processes/process_post.dart';
 import 'package:govguide/screens/profile/profile_screen.dart';
@@ -79,6 +80,10 @@ GoRouter createRouter(AuthProvider authProvider) {
       GoRoute(
         path: '/help',
         builder: (context, state) => const HelpCenterScreen(),
+      ),
+      GoRoute(
+        path: '/my-processes',
+        builder: (context, state) => const MyProcessesScreen(),
       ),
     ],
   );
