@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'dart:convert'; // For JSON decoding
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:http/http.dart' as http; // For Cloudinary API
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Added for User ID
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PostProcessScreen extends StatefulWidget {
   const PostProcessScreen({super.key});
@@ -16,6 +17,13 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
   final _formKey = GlobalKey<FormState>();
   File? _selectedImage;
   bool _isUploading = false;
+
+  // ---------------------------------------------------------
+  // CLOUDINARY CONFIGURATION (Already Filled)
+  // ---------------------------------------------------------
+  final String cloudName = "dwox9olhr"; 
+  final String uploadPreset = "govguide"; 
+  // ---------------------------------------------------------
 
   // Controllers
   final _titleController = TextEditingController();
@@ -72,6 +80,30 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
     }
   }
 
+  /// ---------------------------------------------------------
+  /// Uploads image to Cloudinary and returns the URL
+  /// ---------------------------------------------------------
+  Future<String?> _uploadImageToCloudinary(File imageFile) async {
+    final url = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
+    
+    final request = http.MultipartRequest('POST', url)
+      ..fields['upload_preset'] = uploadPreset
+      ..files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+
+    final response = await request.send();
+    final responseData = await response.stream.toBytes();
+    final responseString = String.fromCharCodes(responseData);
+    final jsonMap = jsonDecode(responseString);
+
+    if (response.statusCode == 200) {
+      return jsonMap['secure_url']; // Success: Return the link
+    } else {
+      // Failure: Throw detailed error
+      String errorMsg = jsonMap['error']?['message'] ?? "Unknown Error";
+      throw Exception("Cloudinary Upload Failed ($errorMsg). Code: ${response.statusCode}");
+    }
+  }
+
   Future<void> _publishProcess() async {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +112,6 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
       return;
     }
 
-    // Get current user ID
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,11 +124,13 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
 
     try {
       String imageUrl = "";
+      
+      // 1. Upload Image to Cloudinary (if selected)
       if (_selectedImage != null) {
-        String fileName = 'process_${DateTime.now().millisecondsSinceEpoch}.jpg';
-        Reference ref = FirebaseStorage.instance.ref().child('processes/$fileName');
-        await ref.putFile(_selectedImage!);
-        imageUrl = await ref.getDownloadURL();
+        final String? uploadedLink = await _uploadImageToCloudinary(_selectedImage!);
+        if (uploadedLink != null) {
+          imageUrl = uploadedLink;
+        }
       }
 
       List<String> steps = _stepControllers
@@ -109,9 +142,9 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
         _descController.text.trim(),
       );
 
-      // Save to Firestore with userId
+      // 2. Save Data to Firestore
       await FirebaseFirestore.instance.collection('processes').add({
-        'userId': user.uid, // <--- ADDED FIELD FOR FILTERING
+        'userId': user.uid, 
         'title': _titleController.text.trim(),
         'tag': _selectedCategory,
         'agency': _agencyController.text.trim(),
@@ -121,17 +154,25 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
         'location': _locationController.text.trim(),
         'phone': _phoneController.text.trim(),
         'email': _emailController.text.trim(),
-        'imageUrl': imageUrl,
+        'imageUrl': imageUrl, // Stores the Cloudinary URL
         'rating': 0.0,
         'reviews': 0,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Process Published Successfully!"), backgroundColor: Colors.green),
+        );
+        Navigator.pop(context);
+      }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Upload failed: ${e.toString()}"), backgroundColor: Colors.redAccent),
-      );
+      debugPrint("Error: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${e.toString()}"), backgroundColor: Colors.redAccent),
+        );
+      }
     } finally {
       if (mounted) setState(() => _isUploading = false);
     }
@@ -175,12 +216,30 @@ class _PostProcessScreenState extends State<PostProcessScreen> {
                     ),
                     const SizedBox(height: 24),
 
+                    // Image Picker Section
                     if (_selectedImage != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(_selectedImage!, height: 180, width: double.infinity, fit: BoxFit.cover),
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.file(_selectedImage!, height: 180, width: double.infinity, fit: BoxFit.cover),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.black54,
+                                radius: 16,
+                                child: IconButton(
+                                  padding: EdgeInsets.zero,
+                                  icon: const Icon(Icons.close, color: Colors.white, size: 18),
+                                  onPressed: () => setState(() => _selectedImage = null),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
 
